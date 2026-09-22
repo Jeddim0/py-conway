@@ -18,3 +18,11 @@ class Game:
 
         idx = y * screen_width + x
         return self.cells[idx]
+
+    def set_cell_at_coords(self, x, y, new_state):
+        screen_size = list(self.screen.size)
+        screen_width = screen_size[0]
+
+        idx = y * screen_width + x
+
+        self.cells[idx] = new_state 

@@ -4,8 +4,8 @@ from scripts.game import Game
 
 # constants
 
-SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 320, 240
-WINDOW_SCALE = 2
+SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 160, 120
+WINDOW_SCALE = 4
 WINDOW_SIZE = SCREEN_WIDTH * WINDOW_SCALE, SCREEN_HEIGHT * WINDOW_SCALE
 
 UPDATES_PER_SEC = 30
@@ -15,6 +15,8 @@ CELL_DEAD = 0
 
 ALIVE_COLOR = (255, 255, 255)
 DEAD_COLOR = (0, 0, 0)
+
+# init and game loop functions
 
 def init():
     pygame.init()
@@ -29,9 +31,20 @@ def process_input(game):
             game.running = False
 
 def update(game):
-    ...
+    m_pos = pygame.mouse.get_pos()
+    
+    # convert mouse pos in window to play area coords
+    m_pos = (m_pos[0] // WINDOW_SCALE, m_pos[1] // WINDOW_SCALE)
+    m_buttons = pygame.mouse.get_pressed()
+
+    if m_buttons[0]:
+        game.set_cell_at_coords(m_pos[0], m_pos[1], CELL_ALIVE)
+
+    if m_buttons[2]:
+        game.set_cell_at_coords(m_pos[0], m_pos[1], CELL_DEAD)
 
 def render(game):
+    # get game cell data and display it as pixels
     for x in range(SCREEN_WIDTH):
         for y in range(SCREEN_HEIGHT):
             cell_state = game.return_cell_from_coords(x, y)
@@ -40,15 +53,17 @@ def render(game):
             else:
                 game.screen.set_at((x, y), DEAD_COLOR)
 
-    
+    # resize play area to window size and display    
     game.window.blit(pygame.transform.scale(game.screen, WINDOW_SIZE), (0, 0))
     pygame.display.flip()
 
 def main():
     init()
     game = Game()
+    # populate cell list based on size of the play area
     for i in range(SCREEN_HEIGHT * SCREEN_WIDTH):
-        game.cells.append(random.choice((CELL_ALIVE, CELL_DEAD)))
+        game.cells.append(CELL_DEAD)
+
     game.running = True
 
     while game.running:

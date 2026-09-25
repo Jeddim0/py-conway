@@ -47,9 +47,8 @@ class Game:
              return CELL_ALIVE
         elif self.cells[cell_idx] == CELL_ALIVE and living_neighbours != 2 and living_neighbours != 3:
             return CELL_DEAD
-        
-        x, y = self.coords_from_idx(cell_idx)   
-        return self.return_cell_from_coords(x, y)
+            
+        return self.return_cell_from_coords(coords_from_idx(cell_idx))
     
     def coords_from_idx(self, idx):
         screen_size = list(self.screen.size)

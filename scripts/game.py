@@ -73,4 +73,7 @@ class Game:
 
         idx = y * screen_width + x
 
-        self.cells[idx] = new_state 
+        try:
+            self.cells[idx] = new_state 
+        except IndexError: # if we try to change a cell that would be off screen if it existed, we can just pass
+            pass

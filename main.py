@@ -9,7 +9,7 @@ from scripts.game import Game
 # constants
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 160, 120
-WINDOW_SCALE = 4
+WINDOW_SCALE = 8
 WINDOW_SIZE = SCREEN_WIDTH * WINDOW_SCALE, SCREEN_HEIGHT * WINDOW_SCALE
 
 UPDATES_PER_SEC = 30
@@ -35,8 +35,13 @@ def process_input(game):
         if event.type == pygame.QUIT:
             game.running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_k and not game.simulating:
-                game.step_generation()
+            if not game.simulating:
+                if event.key == pygame.K_k:
+                    game.step_generation()
+                if event.key == pygame.K_s:
+                    game.save_layout()
+                if event.key == pygame.K_l:
+                    game.load_layout()
             if event.key == pygame.K_SPACE:
                 game.simulating = not game.simulating
 

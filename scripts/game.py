@@ -1,4 +1,5 @@
 import pygame
+import json 
 
 CELL_ALIVE = 1
 CELL_DEAD = 0
@@ -14,6 +15,16 @@ class Game:
     def __init__(self) -> None:
         if not hasattr(self, 'cells'):
             self.cells = []
+
+    def save_layout(self):
+        with open("layout.json", "w") as fp:
+            json.dump(self.cells, fp)
+
+    def load_layout(self):
+        with open("layout.json", "r") as fp:
+            new_layout = json.load(fp)
+            if len(new_layout) == len(self.cells):
+                self.cells = new_layout
 
     def step_generation(self):
         new_cells = [self.get_new_state(i) for i in range(len(self.cells))]

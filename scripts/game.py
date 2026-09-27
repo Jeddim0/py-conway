@@ -16,12 +16,12 @@ class Game:
         if not hasattr(self, 'cells'):
             self.cells = []
 
-    def save_layout(self):
-        with open("layout.json", "w") as fp:
+    def save_layout(self, file="layout.json"):
+        with open(file, "w") as fp:
             json.dump(self.cells, fp)
 
-    def load_layout(self):
-        with open("layout.json", "r") as fp:
+    def load_layout(self, file="layout.json"):
+        with open(file, "r") as fp:
             new_layout = json.load(fp)
             if len(new_layout) == len(self.cells):
                 self.cells = new_layout

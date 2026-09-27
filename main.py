@@ -97,6 +97,8 @@ def main():
                 game.grid_screen.set_at((x, y), pygame.Color(ALIVE_COLOR.r, ALIVE_COLOR.g, ALIVE_COLOR.b, 50))
 
     game.running = True
+    
+    game.load_layout("default.json")
 
     while game.running:
         process_input(game)

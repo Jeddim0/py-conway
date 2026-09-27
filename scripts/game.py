@@ -63,7 +63,7 @@ class Game:
         return self.return_cell_from_coords(x, y)
     
     def coords_from_idx(self, idx):
-        screen_size = list(self.screen.size)
+        screen_size = list(self.cells_screen.size)
         screen_width = screen_size[0]
 
         y = idx // screen_width
@@ -72,14 +72,14 @@ class Game:
         return x, y
 
     def return_cell_from_coords(self, x, y):
-        screen_size = list(self.screen.size)
+        screen_size = list(self.cells_screen.size)
         screen_width = screen_size[0]
 
         idx = y * screen_width + x
         return self.cells[idx]
 
     def set_cell_at_coords(self, x, y, new_state):
-        screen_size = list(self.screen.size)
+        screen_size = list(self.cells_screen.size)
         screen_width = screen_size[0]
 
         idx = y * screen_width + x

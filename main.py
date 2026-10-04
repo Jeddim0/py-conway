@@ -4,6 +4,7 @@
 
 import pygame
 import random
+import numpy as np
 from scripts.game import Game
 
 # constants
@@ -18,7 +19,12 @@ CELL_ALIVE = 1
 CELL_DEAD = 0
 
 ALIVE_COLOR = pygame.Color('white')
-DEAD_COLOR = pygame.Color('black')
+DEAD_COLOR  = pygame.Color('black')
+COLORKEY = DEAD_COLOR
+
+# tuple forms for numpy broadcasting
+ALIVE_RGBA = tuple(ALIVE_COLOR)          # (255, 255, 255, 255)
+DEAD_RGBA  = (0, 0, 0, 0)                # transparent
 
 # init and game loop functions
 
@@ -26,7 +32,8 @@ def init():
     pygame.init()
     game = Game()
     game.grid_screen = pygame.Surface(WINDOW_SIZE, pygame.SRCALPHA)
-    game.cells_screen = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
+    game.cells_screen = pygame.Surface(SCREEN_SIZE)
+    game.cells_screen.set_colorkey(COLORKEY)
     game.window = pygame.display.set_mode(WINDOW_SIZE)
     game.clock = pygame.time.Clock()
     game.simulating = False
@@ -44,6 +51,8 @@ def process_input(game):
                     game.save_layout()
                 if event.key == pygame.K_l:
                     game.load_layout()
+                if event.key == pygame.K_c:
+                    game.cells = [0 for cell in game.cells]
             if event.key == pygame.K_SPACE:
                 game.simulating = not game.simulating
             if event.key == pygame.K_g:
@@ -52,31 +61,30 @@ def process_input(game):
 def update(game):
     if game.simulating:
         game.step_generation()
-    else:
-        m_pos = pygame.mouse.get_pos()
-        
-        # convert mouse pos in window to play area coords
-        m_pos = (m_pos[0] // WINDOW_SCALE, m_pos[1] // WINDOW_SCALE)
-        m_buttons = pygame.mouse.get_pressed()
+    # else:
+    m_pos = pygame.mouse.get_pos()
+    
+    # convert mouse pos in window to play area coords
+    m_pos = (m_pos[0] // WINDOW_SCALE, m_pos[1] // WINDOW_SCALE)
+    m_buttons = pygame.mouse.get_pressed()
 
-        if m_buttons[0]:
-            game.set_cell_at_coords(m_pos[0], m_pos[1], CELL_ALIVE)
+    if m_buttons[0]:
+        game.set_cell_at_coords(m_pos[0], m_pos[1], CELL_ALIVE)
 
-        if m_buttons[2]:
-            game.set_cell_at_coords(m_pos[0], m_pos[1], CELL_DEAD)
+    if m_buttons[2]:
+        game.set_cell_at_coords(m_pos[0], m_pos[1], CELL_DEAD)
 
 def render(game):
-    # get game cell data and display it as pixels
-    for x in range(SCREEN_WIDTH):
-        for y in range(SCREEN_HEIGHT):
-            cell_state = game.return_cell_from_coords(x, y)
-            if cell_state == CELL_ALIVE:
-                game.cells_screen.set_at((x, y), ALIVE_COLOR)
-            else:
-                game.cells_screen.set_at((x, y), (0, 0, 0, 0))
-
-    # resize play area to window size and display    
     game.window.fill(DEAD_COLOR)
+    cells = np.array(game.cells, dtype=np.uint8).reshape(SCREEN_HEIGHT, SCREEN_WIDTH).T
+
+    arr = np.empty((SCREEN_WIDTH, SCREEN_HEIGHT, 3), dtype=np.uint8)
+    arr[..., 0] = np.where(cells == CELL_ALIVE, 255, 0)   # R
+    arr[..., 1] = np.where(cells == CELL_ALIVE, 255, 0)   # G
+    arr[..., 2] = np.where(cells == CELL_ALIVE, 255, 0)   # B
+    # arr[..., 3] = np.where(cells == CELL_ALIVE, 255, 0)   # A
+
+    pygame.surfarray.blit_array(game.cells_screen, arr)
     if game.show_grid:
         game.window.blit(game.grid_screen, (0, 0))
     game.window.blit(pygame.transform.scale(game.cells_screen, WINDOW_SIZE), (0, 0))
@@ -104,6 +112,8 @@ def main():
         process_input(game)
         update(game)
         render(game)
+
+        game.clock.tick(40)
 
     pygame.quit()
 
